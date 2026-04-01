@@ -1,0 +1,10 @@
+{
+  "domain": "monkeytype",
+  "name": "Monkeytype",
+  "version": "0.5.0",
+  "documentation": "https://api.monkeytype.com",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "iot_class": "cloud_polling"
+}
