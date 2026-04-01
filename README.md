@@ -3,48 +3,49 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 ![Version](https://img.shields.io/badge/version-0.5.0-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
+&nbsp;&nbsp;[🇩🇪 Deutsche Version](README.de.md)
 
-Bringt deine [Monkeytype](https://monkeytype.com)-Stats direkt ins Home Assistant Dashboard –
-als native Sensoren und als kompakte Lovelace-Karte.
+Brings your [Monkeytype](https://monkeytype.com) stats directly into your Home Assistant dashboard –
+as native sensors and a compact Lovelace card.
 
 ---
 
 ## Features
 
-- **Sensor: Today Best WPM** – höchste WPM des heutigen Tages, gefiltert auf Modus und Sprache
-- **Sensor: Leaderboard Rank** – aktueller globaler Rang auf der Monkeytype-Bestenliste
-- **Lovelace Card** – platzsparende Karte mit Tastatur-Icon und Fließtext
-- Polling alle 5 Minuten (innerhalb des API-Rate-Limits)
-- Passt sich automatisch dem HA-Theme (Hell/Dunkel) an
+- **Sensor: Today Best WPM** – highest WPM of the current day, filtered by mode and language
+- **Sensor: Leaderboard Rank** – your current global rank on the Monkeytype leaderboard
+- **Lovelace Card** – compact card with keyboard icon and inline values
+- Polls every 5 minutes (well within the API rate limit)
+- Automatically adapts to the HA theme (light/dark)
 
 ---
 
-## Voraussetzungen
+## Prerequisites
 
-- Home Assistant 2024.1 oder neuer
-- Ein Monkeytype-Account mit generiertem **ApeKey**
+- Home Assistant 2024.1 or newer
+- A Monkeytype account with a generated **ApeKey**
 
-### ApeKey erstellen
+### Creating an ApeKey
 
-1. Auf [monkeytype.com](https://monkeytype.com) einloggen
-2. **Account → Ape Keys → Generate New**
-3. Scopes aktivieren: `results`, `leaderboards`
-4. Key kopieren und sicher aufbewahren
+1. Log in at [monkeytype.com](https://monkeytype.com)
+2. Go to **Account → Ape Keys → Generate New**
+3. Enable scopes: `results`, `leaderboards`
+4. Copy the key and store it safely
 
 ---
 
 ## Installation via HACS
 
-1. HACS öffnen → **Integrationen**
-2. Oben rechts auf **⋮ → Benutzerdefinierte Repositories**
-3. URL eintragen: `https://github.com/HACucoo/monkeytype-ha`
-   Kategorie: **Integration**
-4. **Hinzufügen** klicken, danach die Integration in HACS suchen und installieren
-5. Home Assistant neu starten
+1. Open HACS → **Integrations**
+2. Click **⋮ → Custom Repositories** (top right)
+3. Enter URL: `https://github.com/HACucoo/monkeytype-ha`
+   Category: **Integration**
+4. Click **Add**, then search for the integration in HACS and install it
+5. Restart Home Assistant
 
 ---
 
-## Manuelle Installation
+## Manual Installation
 
 ```
 config/
@@ -56,63 +57,63 @@ config/
         └── manifest.json
 ```
 
-Ordner aus dem [neuesten Release](https://github.com/HACucoo/monkeytype-ha/releases) nach `custom_components/monkeytype/` kopieren, dann HA neu starten.
+Copy the folder from the [latest release](https://github.com/HACucoo/monkeytype-ha/releases) into `custom_components/monkeytype/`, then restart HA.
 
 ---
 
-## Konfiguration
+## Configuration
 
-Die Integration wird vollständig über die Home Assistant UI eingerichtet – keine `configuration.yaml` nötig.
+The integration is configured entirely through the Home Assistant UI – no `configuration.yaml` needed.
 
-**Einstellungen → Geräte & Dienste → Integration hinzufügen → „Monkeytype"**
+**Settings → Devices & Services → Add Integration → "Monkeytype"**
 
-Im Dialog folgende Felder ausfüllen:
+Fill in the following fields:
 
-| Feld | Beschreibung | Standard |
+| Field | Description | Default |
 |---|---|---|
-| ApeKey | API-Schlüssel aus deinem Monkeytype-Account | – |
-| Modus | `time`, `words`, `quote`, `custom`, `zen` | `time` |
-| Modus-Detail | z. B. `60`, `15`, `100` | `60` |
-| Sprache | z. B. `english`, `german` | `english` |
+| ApeKey | API key from your Monkeytype account | – |
+| Mode | `time`, `words`, `quote`, `custom`, `zen` | `time` |
+| Mode detail | e.g. `60`, `15`, `100` | `60` |
+| Language | e.g. `english`, `german` | `english` |
 
-Der ApeKey wird beim Speichern direkt gegen die API geprüft.
+The ApeKey is validated against the API immediately on save.
 
-**Mehrere Modi** (z. B. 15s und 60s) lassen sich durch erneutes Hinzufügen der Integration mit anderen Werten einrichten.
+**Multiple modes** (e.g. 15s and 60s) can be set up by adding the integration again with different values.
 
-### Erzeugte Sensoren
+### Generated sensors
 
-Die Entity-ID setzt sich aus den konfigurierten Werten zusammen:
+The entity ID is composed from the configured values:
 
 ```
 sensor.monkeytype_today_best_wpm_{mode}{mode2}_{language}
 sensor.monkeytype_rank_{mode}{mode2}_{language}
 ```
 
-Mit den Standardwerten (`time`, `60`, `english`) ergibt das:
+With the default values (`time`, `60`, `english`) this results in:
 
-| Entity | Beschreibung |
+| Entity | Description |
 |---|---|
-| `sensor.monkeytype_today_best_wpm_time60_english` | Heutige Höchst-WPM |
-| `sensor.monkeytype_rank_time60_english` | Leaderboard-Rang (`unknown` wenn nicht platziert) |
+| `sensor.monkeytype_today_best_wpm_time60_english` | Today's highest WPM |
+| `sensor.monkeytype_rank_time60_english` | Leaderboard rank (`unknown` if not ranked) |
 
-Bei `Modus-Detail: 15` wären es entsprechend `..._time15_english` usw.
+With `Mode detail: 15` it would be `..._time15_english` and so on.
 
 ---
 
 ## Lovelace Card
 
-### Ressource registrieren
+### Register resource
 
-`www/monkeytype-card.js` nach `config/www/` kopieren, dann unter
-**Einstellungen → Dashboards → ⋮ → Ressourcen** eintragen:
+Copy `www/monkeytype-card.js` to `config/www/`, then add it under
+**Settings → Dashboards → ⋮ → Resources**:
 
-| URL | Typ |
+| URL | Type |
 |---|---|
-| `/local/monkeytype-card.js` | JavaScript-Modul |
+| `/local/monkeytype-card.js` | JavaScript module |
 
-### Karte einbinden
+### Add the card
 
-Im Dashboard-Editor → **Karte hinzufügen → Manuell:**
+In the dashboard editor → **Add card → Manual:**
 
 ```yaml
 type: custom:monkeytype-card
@@ -121,11 +122,11 @@ rank_entity: sensor.monkeytype_rank_time60_english
 label: Monkeytype   # optional
 ```
 
-Die Karte belegt genau eine Zeile und sieht so aus:
+The card takes up exactly one row and looks like this:
 
 ```
 ⌨  MONKEYTYPE
-   89.5 WPM  │  #1.234 Rang
+   89.5 WPM  │  #1,234 Rank
 ```
 
 ---
@@ -133,6 +134,6 @@ Die Karte belegt genau eine Zeile und sieht so aus:
 ## Changelog
 
 ### 0.5.0
-- Initiales Release
-- Sensoren: Today Best WPM, Leaderboard Rank
+- Initial release
+- Sensors: Today Best WPM, Leaderboard Rank
 - Lovelace Card: `monkeytype-card`
