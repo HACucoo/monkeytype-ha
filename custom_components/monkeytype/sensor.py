@@ -4,32 +4,33 @@ from __future__ import annotations
 import logging
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, CONF_API_KEY, CONF_MODE, CONF_MODE2, CONF_LANGUAGE
+from .const import DOMAIN, CONF_MODE, CONF_MODE2, CONF_LANGUAGE, DEFAULT_MODE, DEFAULT_MODE2, DEFAULT_LANGUAGE
 from . import MonkeytypeCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up sensors from configuration.yaml discovery."""
-    if discovery_info is None:
-        return
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    coordinator: MonkeytypeCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    api_key = discovery_info[CONF_API_KEY]
-    coordinator: MonkeytypeCoordinator = hass.data[DOMAIN][api_key]
-
-    mode = discovery_info.get(CONF_MODE, "time")
-    mode2 = discovery_info.get(CONF_MODE2, "60")
-    language = discovery_info.get(CONF_LANGUAGE, "english")
+    mode = entry.data.get(CONF_MODE, DEFAULT_MODE)
+    mode2 = entry.data.get(CONF_MODE2, DEFAULT_MODE2)
+    language = entry.data.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
     label = f"{mode}{mode2}_{language}"
 
     async_add_entities([
         MonkeytypeTodayBestWpmSensor(coordinator, label),
         MonkeytypeRankSensor(coordinator, label),
-    ], update_before_add=True)
+    ])
 
 
 class MonkeytypeTodayBestWpmSensor(CoordinatorEntity, SensorEntity):
@@ -41,7 +42,6 @@ class MonkeytypeTodayBestWpmSensor(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator: MonkeytypeCoordinator, label: str) -> None:
         super().__init__(coordinator)
-        self._label = label
         self._attr_name = f"Monkeytype Today Best WPM ({label})"
         self._attr_unique_id = f"monkeytype_today_best_wpm_{label}"
 
@@ -58,7 +58,6 @@ class MonkeytypeRankSensor(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator: MonkeytypeCoordinator, label: str) -> None:
         super().__init__(coordinator)
-        self._label = label
         self._attr_name = f"Monkeytype Rank ({label})"
         self._attr_unique_id = f"monkeytype_rank_{label}"
 

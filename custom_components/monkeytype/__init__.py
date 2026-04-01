@@ -18,6 +18,9 @@ from .const import (
     CONF_MODE,
     CONF_MODE2,
     CONF_LANGUAGE,
+    DEFAULT_MODE,
+    DEFAULT_MODE2,
+    DEFAULT_LANGUAGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,39 +28,34 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor"]
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up from configuration.yaml."""
-    hass.data.setdefault(DOMAIN, {})
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    coordinator = MonkeytypeCoordinator(hass, entry.data)
+    await coordinator.async_config_entry_first_refresh()
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    return True
 
-    if DOMAIN not in config:
-        return True
 
-    for entry_config in config[DOMAIN] if isinstance(config[DOMAIN], list) else [config[DOMAIN]]:
-        coordinator = MonkeytypeCoordinator(hass, entry_config)
-        await coordinator.async_refresh()
-        hass.data[DOMAIN][entry_config[CONF_API_KEY]] = coordinator
-
-        hass.async_create_task(
-            hass.helpers.discovery.async_load_platform("sensor", DOMAIN, entry_config, config)
-        )
-
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    hass.data[DOMAIN].pop(entry.entry_id)
     return True
 
 
 class MonkeytypeCoordinator(DataUpdateCoordinator):
     """Fetches data from Monkeytype API."""
 
-    def __init__(self, hass: HomeAssistant, config: dict) -> None:
+    def __init__(self, hass: HomeAssistant, data: dict) -> None:
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=SCAN_INTERVAL_MINUTES),
         )
-        self._api_key = config[CONF_API_KEY]
-        self._mode = config.get(CONF_MODE, "time")
-        self._mode2 = config.get(CONF_MODE2, "60")
-        self._language = config.get(CONF_LANGUAGE, "english")
+        self._api_key = data[CONF_API_KEY]
+        self._mode = data.get(CONF_MODE, DEFAULT_MODE)
+        self._mode2 = data.get(CONF_MODE2, DEFAULT_MODE2)
+        self._language = data.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
 
     @property
     def headers(self) -> dict:
@@ -76,7 +74,6 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
 
     async def _fetch_today_best_wpm(self, session: aiohttp.ClientSession) -> float | None:
-        """Fetch results and return today's highest WPM."""
         url = f"{BASE_URL}/users/results"
         params = {"limit": 100}
 
@@ -92,7 +89,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
 
         now = datetime.now(tz=timezone.utc)
         start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        start_ts = start_of_today.timestamp() * 1000  # API uses milliseconds
+        start_ts = start_of_today.timestamp() * 1000
 
         today_wpms = [
             r["wpm"]
@@ -105,7 +102,6 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
         return round(max(today_wpms), 2) if today_wpms else None
 
     async def _fetch_rank(self, session: aiohttp.ClientSession) -> int | None:
-        """Fetch the user's leaderboard rank."""
         url = f"{BASE_URL}/leaderboards/rank"
         params = {
             "language": self._language,
@@ -115,7 +111,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
 
         async with session.get(url, headers=self.headers, params=params) as resp:
             if resp.status in (404, 204):
-                return None  # user not on leaderboard
+                return None
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             resp.raise_for_status()

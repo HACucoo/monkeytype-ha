@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Monkeytype einrichten",
+        "description": "ApeKey unter monkeytype.com → Account → Ape Keys generieren (Scopes: results, leaderboards).",
+        "data": {
+          "api_key": "ApeKey",
+          "mode": "Modus",
+          "mode2": "Modus-Detail (z. B. 60, 15, 100 …)",
+          "language": "Sprache (z. B. english, german)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Ungültiger ApeKey – bitte prüfen",
+      "cannot_connect": "Verbindung zur Monkeytype API fehlgeschlagen"
+    },
+    "abort": {
+      "already_configured": "Dieser Modus ist bereits eingerichtet"
+    }
+  }
+}

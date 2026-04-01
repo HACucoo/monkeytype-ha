@@ -62,27 +62,26 @@ Ordner aus dem [neuesten Release](https://github.com/HACucoo/monkeytype-ha/relea
 
 ## Konfiguration
 
-In `configuration.yaml`:
+Die Integration wird vollständig über die Home Assistant UI eingerichtet – keine `configuration.yaml` nötig.
 
-```yaml
-monkeytype:
-  api_key: DEIN_APE_KEY
-  mode: time        # optional – default: time
-  mode2: "60"       # optional – default: "60"
-  language: english # optional – default: english
-```
+**Einstellungen → Geräte & Dienste → Integration hinzufügen → „Monkeytype"**
 
-**Mehrere Modi gleichzeitig** (z. B. 15s und 60s):
+Im Dialog folgende Felder ausfüllen:
 
-```yaml
-monkeytype:
-  - api_key: DEIN_APE_KEY
-    mode2: "60"
-  - api_key: DEIN_APE_KEY
-    mode2: "15"
-```
+| Feld | Beschreibung | Standard |
+|---|---|---|
+| ApeKey | API-Schlüssel aus deinem Monkeytype-Account | – |
+| Modus | `time`, `words`, `quote`, `custom`, `zen` | `time` |
+| Modus-Detail | z. B. `60`, `15`, `100` | `60` |
+| Sprache | z. B. `english`, `german` | `english` |
 
-Nach dem Neustart tauchen die Sensoren automatisch auf. Die Entity-ID setzt sich aus den konfigurierten Werten zusammen:
+Der ApeKey wird beim Speichern direkt gegen die API geprüft.
+
+**Mehrere Modi** (z. B. 15s und 60s) lassen sich durch erneutes Hinzufügen der Integration mit anderen Werten einrichten.
+
+### Erzeugte Sensoren
+
+Die Entity-ID setzt sich aus den konfigurierten Werten zusammen:
 
 ```
 sensor.monkeytype_today_best_wpm_{mode}{mode2}_{language}
@@ -96,7 +95,7 @@ Mit den Standardwerten (`time`, `60`, `english`) ergibt das:
 | `sensor.monkeytype_today_best_wpm_time60_english` | Heutige Höchst-WPM |
 | `sensor.monkeytype_rank_time60_english` | Leaderboard-Rang (`unknown` wenn nicht platziert) |
 
-Bei `mode2: "15"` wären es entsprechend `..._time15_english` usw.
+Bei `Modus-Detail: 15` wären es entsprechend `..._time15_english` usw.
 
 ---
 
