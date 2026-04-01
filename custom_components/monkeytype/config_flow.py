@@ -1,11 +1,14 @@
 """Config flow for Monkeytype."""
 from __future__ import annotations
 
+import logging
+
 import aiohttp
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
     DOMAIN,
@@ -18,6 +21,8 @@ from .const import (
     DEFAULT_MODE2,
     DEFAULT_LANGUAGE,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 STEP_USER_SCHEMA = vol.Schema(
     {
@@ -48,7 +53,8 @@ class MonkeytypeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
-            errors = await _validate_api_key(user_input[CONF_API_KEY])
+            session = async_get_clientsession(self.hass)
+            errors = await _validate_api_key(session, user_input[CONF_API_KEY])
 
             if not errors:
                 title = (
@@ -65,20 +71,22 @@ class MonkeytypeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-async def _validate_api_key(api_key: str) -> dict[str, str]:
+async def _validate_api_key(session: aiohttp.ClientSession, api_key: str) -> dict[str, str]:
     """Test the ApeKey against the API. Returns errors dict (empty = OK)."""
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{BASE_URL}/results",
-                headers={"Authorization": f"ApeKey {api_key}"},
-                params={"limit": 1},
-                timeout=aiohttp.ClientTimeout(total=10),
-            ) as resp:
-                if resp.status == 401:
-                    return {"base": "invalid_auth"}
-                if resp.status != 200:
-                    return {"base": "cannot_connect"}
-    except aiohttp.ClientError:
+        async with session.get(
+            f"{BASE_URL}/results",
+            headers={"Authorization": f"ApeKey {api_key}"},
+            params={"limit": 1},
+            timeout=aiohttp.ClientTimeout(total=10),
+        ) as resp:
+            _LOGGER.debug("Monkeytype validation response: %s", resp.status)
+            if resp.status == 401:
+                return {"base": "invalid_auth"}
+            if resp.status != 200:
+                _LOGGER.warning("Monkeytype API returned unexpected status %s", resp.status)
+                return {"base": "cannot_connect"}
+    except aiohttp.ClientError as err:
+        _LOGGER.warning("Monkeytype connection error: %s", err)
         return {"base": "cannot_connect"}
     return {}

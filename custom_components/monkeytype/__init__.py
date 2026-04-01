@@ -8,6 +8,7 @@ import aiohttp
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -63,9 +64,9 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> dict:
         try:
-            async with aiohttp.ClientSession() as session:
-                today_wpm = await self._fetch_today_best_wpm(session)
-                rank = await self._fetch_rank(session)
+            session = async_get_clientsession(self.hass)
+            today_wpm = await self._fetch_today_best_wpm(session)
+            rank = await self._fetch_rank(session)
             return {
                 "today_best_wpm": today_wpm,
                 "rank": rank,
