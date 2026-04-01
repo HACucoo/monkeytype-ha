@@ -82,12 +82,21 @@ monkeytype:
     mode2: "15"
 ```
 
-Nach dem Neustart tauchen die Sensoren automatisch auf:
+Nach dem Neustart tauchen die Sensoren automatisch auf. Die Entity-ID setzt sich aus den konfigurierten Werten zusammen:
+
+```
+sensor.monkeytype_today_best_wpm_{mode}{mode2}_{language}
+sensor.monkeytype_rank_{mode}{mode2}_{language}
+```
+
+Mit den Standardwerten (`time`, `60`, `english`) ergibt das:
 
 | Entity | Beschreibung |
 |---|---|
 | `sensor.monkeytype_today_best_wpm_time60_english` | Heutige Höchst-WPM |
 | `sensor.monkeytype_rank_time60_english` | Leaderboard-Rang (`unknown` wenn nicht platziert) |
+
+Bei `mode2: "15"` wären es entsprechend `..._time15_english` usw.
 
 ---
 
