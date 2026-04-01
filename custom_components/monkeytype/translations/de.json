@@ -14,6 +14,7 @@
     },
     "error": {
       "invalid_auth": "Ungültiger ApeKey – bitte prüfen",
+      "ape_key_inactive": "ApeKey ist inaktiv – aktivieren unter monkeytype.com → Account → Ape Keys",
       "cannot_connect": "Verbindung zur Monkeytype API fehlgeschlagen"
     },
     "abort": {

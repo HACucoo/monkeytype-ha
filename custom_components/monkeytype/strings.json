@@ -14,6 +14,7 @@
     },
     "error": {
       "invalid_auth": "Invalid ApeKey – please check your key",
+      "ape_key_inactive": "ApeKey is inactive – enable it on monkeytype.com → Account → Ape Keys",
       "cannot_connect": "Could not connect to the Monkeytype API"
     },
     "abort": {

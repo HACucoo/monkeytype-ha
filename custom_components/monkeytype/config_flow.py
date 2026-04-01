@@ -13,6 +13,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import (
     DOMAIN,
     BASE_URL,
+    CLIENT_VERSION,
     CONF_API_KEY,
     CONF_MODE,
     CONF_MODE2,
@@ -76,13 +77,15 @@ async def _validate_api_key(session: aiohttp.ClientSession, api_key: str) -> dic
     try:
         async with session.get(
             f"{BASE_URL}/results",
-            headers={"Authorization": f"ApeKey {api_key}"},
+            headers={"Authorization": f"ApeKey {api_key}", "X-Client-Version": CLIENT_VERSION},
             params={"limit": 1},
             timeout=aiohttp.ClientTimeout(total=10),
         ) as resp:
             _LOGGER.debug("Monkeytype validation response: %s", resp.status)
             if resp.status == 401:
                 return {"base": "invalid_auth"}
+            if resp.status == 471:
+                return {"base": "ape_key_inactive"}
             if resp.status != 200:
                 _LOGGER.warning("Monkeytype API returned unexpected status %s", resp.status)
                 return {"base": "cannot_connect"}

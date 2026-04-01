@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import (
     DOMAIN,
     BASE_URL,
+    CLIENT_VERSION,
     SCAN_INTERVAL_MINUTES,
     CONF_API_KEY,
     CONF_MODE,
@@ -60,7 +61,10 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
 
     @property
     def headers(self) -> dict:
-        return {"Authorization": f"ApeKey {self._api_key}"}
+        return {
+            "Authorization": f"ApeKey {self._api_key}",
+            "X-Client-Version": CLIENT_VERSION,
+        }
 
     async def _async_update_data(self) -> dict:
         try:
