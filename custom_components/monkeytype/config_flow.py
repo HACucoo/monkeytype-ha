@@ -70,7 +70,7 @@ async def _validate_api_key(api_key: str) -> dict[str, str]:
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                f"{BASE_URL}/users/results",
+                f"{BASE_URL}/results",
                 headers={"Authorization": f"ApeKey {api_key}"},
                 params={"limit": 1},
                 timeout=aiohttp.ClientTimeout(total=10),

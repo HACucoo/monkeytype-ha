@@ -74,7 +74,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
 
     async def _fetch_today_best_wpm(self, session: aiohttp.ClientSession) -> float | None:
-        url = f"{BASE_URL}/users/results"
+        url = f"{BASE_URL}/results"
         params = {"limit": 100}
 
         async with session.get(url, headers=self.headers, params=params) as resp:
