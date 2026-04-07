@@ -121,6 +121,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             resp.raise_for_status()
             data = await resp.json()
+            _LOGGER.debug("Leaderboard rank response (%s): %s", resp.status, data)
 
         entry = (data or {}).get("data")
         return entry.get("rank") if entry else None
