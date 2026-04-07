@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import aiohttp
 
@@ -28,6 +29,16 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = ["sensor"]
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Register the Lovelace card as a static asset."""
+    hass.http.register_static_path(
+        "/monkeytype/monkeytype-card.js",
+        str(Path(__file__).parent / "www" / "monkeytype-card.js"),
+        cache_headers=False,
+    )
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

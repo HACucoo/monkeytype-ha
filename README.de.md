@@ -104,12 +104,14 @@ Bei `Modus-Detail: 15` wären es entsprechend `..._time15_english` usw.
 
 ### Ressource registrieren
 
-`www/monkeytype-card.js` nach `config/www/` kopieren, dann unter
-**Einstellungen → Dashboards → ⋮ → Ressourcen** eintragen:
+Die Karte ist im Integration-Paket enthalten und wird automatisch bereitgestellt.
+Einmalig unter **Einstellungen → Dashboards → ⋮ → Ressourcen** eintragen:
 
 | URL | Typ |
 |---|---|
-| `/local/monkeytype-card.js` | JavaScript-Modul |
+| `/monkeytype/monkeytype-card.js` | JavaScript-Modul |
+
+Kein manuelles Kopieren nötig – HACS erledigt das.
 
 ### Karte einbinden
 
