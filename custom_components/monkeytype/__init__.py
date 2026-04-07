@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.components.http import StaticPathConfig
 
 from .const import (
     DOMAIN,
@@ -33,11 +34,13 @@ PLATFORMS = ["sensor"]
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Register the Lovelace card as a static asset."""
-    hass.http.register_static_path(
-        "/monkeytype/monkeytype-card.js",
-        str(Path(__file__).parent / "www" / "monkeytype-card.js"),
-        cache_headers=False,
-    )
+    await hass.http.async_register_static_paths([
+        StaticPathConfig(
+            "/monkeytype/monkeytype-card.js",
+            str(Path(__file__).parent / "www" / "monkeytype-card.js"),
+            cache_headers=False,
+        )
+    ])
     return True
 
 
