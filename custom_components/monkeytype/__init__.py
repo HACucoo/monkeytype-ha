@@ -88,7 +88,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             resp.raise_for_status()
             data = await resp.json()
 
-        results = data.get("data") or []
+        results = (data or {}).get("data") or []
         if not results:
             return None
 
@@ -122,5 +122,5 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             resp.raise_for_status()
             data = await resp.json()
 
-        entry = data.get("data")
+        entry = (data or {}).get("data")
         return entry.get("rank") if entry else None
