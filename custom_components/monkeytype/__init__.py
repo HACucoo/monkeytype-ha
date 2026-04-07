@@ -46,9 +46,14 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = MonkeytypeCoordinator(hass, entry.data)
-    await coordinator.async_config_entry_first_refresh()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # First refresh in background – does not block HA startup
+    entry.async_create_background_task(
+        hass,
+        coordinator.async_refresh(),
+        "monkeytype_initial_refresh",
+    )
     return True
 
 
