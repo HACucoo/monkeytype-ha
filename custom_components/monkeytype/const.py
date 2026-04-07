@@ -6,7 +6,7 @@ CONF_LANGUAGE = "language"
 
 BASE_URL = "https://api.monkeytype.com"
 CLIENT_VERSION = "custom_component"
-SCAN_INTERVAL_MINUTES = 5
+SCAN_INTERVAL_MINUTES = 10
 
 DEFAULT_MODE = "time"
 DEFAULT_MODE2 = "60"
