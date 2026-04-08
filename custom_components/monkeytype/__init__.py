@@ -32,6 +32,10 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor"]
 
 
+class _RateLimitError(Exception):
+    """Raised when Monkeytype returns 479."""
+
+
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Register the Lovelace card as a static asset."""
     await hass.http.async_register_static_paths([
@@ -94,6 +98,9 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
                 "today_best_wpm": today_wpm,
                 "rank": rank,
             }
+        except _RateLimitError:
+            _LOGGER.warning("Monkeytype rate limit hit – keeping last known values")
+            return self.data or {"today_best_wpm": None, "rank": None}
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
 
@@ -105,7 +112,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                raise UpdateFailed("Monkeytype rate limit hit – keeping last known values")
+                raise _RateLimitError
             resp.raise_for_status()
             data = await resp.json()
 
@@ -141,7 +148,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                raise UpdateFailed("Monkeytype rate limit hit – keeping last known values")
+                raise _RateLimitError
             resp.raise_for_status()
             data = await resp.json()
             _LOGGER.debug("Leaderboard rank response (%s): %s", resp.status, data)
