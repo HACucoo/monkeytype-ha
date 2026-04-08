@@ -1,7 +1,7 @@
 # Monkeytype for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.5.0-blue)
+![Version](https://img.shields.io/badge/version-0.6.0-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇩🇪 Deutsche Version](README.de.md)
 
@@ -134,6 +134,16 @@ The card takes up exactly one row and looks like this:
 ---
 
 ## Changelog
+
+### 0.6.0
+- Fix: correct API endpoint (`/results`)
+- Fix: `X-Client-Version` header added
+- Fix: 471 (ApeKey inactive) shows clear error message
+- Fix: 479 (rate limit) raises UpdateFailed – last known values are preserved
+- Fix: guard against null API responses
+- Fix: use HA-managed aiohttp session
+- Fix: non-blocking HA startup
+- Feat: Lovelace card bundled inside component directory (no manual file copy needed)
 
 ### 0.5.0
 - Initial release
