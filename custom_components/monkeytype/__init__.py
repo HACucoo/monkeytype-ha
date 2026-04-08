@@ -105,8 +105,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                _LOGGER.warning("Monkeytype rate limit hit – skipping update")
-                return None
+                raise UpdateFailed("Monkeytype rate limit hit – keeping last known values")
             resp.raise_for_status()
             data = await resp.json()
 
@@ -142,8 +141,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                _LOGGER.warning("Monkeytype rate limit hit – skipping update")
-                return None
+                raise UpdateFailed("Monkeytype rate limit hit – keeping last known values")
             resp.raise_for_status()
             data = await resp.json()
             _LOGGER.debug("Leaderboard rank response (%s): %s", resp.status, data)
