@@ -105,8 +105,10 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
                 "rank": rank,
             }
         except _RateLimitError:
-            _LOGGER.warning("Monkeytype rate limit hit – keeping last known values")
-            return self.data or {"today_best_wpm": None, "rank": None}
+            if self.data:
+                _LOGGER.warning("Monkeytype rate limit hit – keeping last known values")
+                return self.data
+            raise UpdateFailed("Monkeytype rate limit hit on first fetch – will retry")
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
 
