@@ -35,6 +35,8 @@ PLATFORMS = ["sensor"]
 
 class _RateLimitError(Exception):
     """Raised when Monkeytype returns 479."""
+    def __init__(self, reset_ts: int | None = None) -> None:
+        self.reset_ts = reset_ts
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -87,6 +89,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
         self._mode = data.get(CONF_MODE, DEFAULT_MODE)
         self._mode2 = data.get(CONF_MODE2, DEFAULT_MODE2)
         self._language = data.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
+        self._default_interval = timedelta(minutes=SCAN_INTERVAL_MINUTES)
 
     @property
     def headers(self) -> dict:
@@ -100,17 +103,32 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             session = async_get_clientsession(self.hass)
             today_wpm = await self._fetch_today_best_wpm(session)
             rank = await self._fetch_rank(session)
+            # Successful fetch – restore normal interval
+            self.update_interval = self._default_interval
             return {
                 "today_best_wpm": today_wpm,
                 "rank": rank,
             }
-        except _RateLimitError:
+        except _RateLimitError as err:
+            self._apply_rate_limit_backoff(err.reset_ts)
             if self.data:
-                _LOGGER.warning("Monkeytype rate limit hit – keeping last known values")
                 return self.data
             raise UpdateFailed("Monkeytype rate limit hit on first fetch – will retry")
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
+
+    def _apply_rate_limit_backoff(self, reset_ts: int | None) -> None:
+        if reset_ts:
+            wait = max(60, reset_ts - int(datetime.now(tz=timezone.utc).timestamp()))
+            self.update_interval = timedelta(seconds=wait + 10)
+            _LOGGER.warning(
+                "Monkeytype rate limit hit – next retry in %d min %d sec",
+                wait // 60, wait % 60,
+            )
+        else:
+            # No reset timestamp – back off for 30 minutes
+            self.update_interval = timedelta(minutes=30)
+            _LOGGER.warning("Monkeytype rate limit hit – backing off for 30 min")
 
     async def _fetch_today_best_wpm(self, session: aiohttp.ClientSession) -> float | None:
         url = f"{BASE_URL}/results"
@@ -120,7 +138,8 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                raise _RateLimitError
+                reset_ts = resp.headers.get("x-ratelimit-reset")
+                raise _RateLimitError(int(reset_ts) if reset_ts else None)
             resp.raise_for_status()
             data = await resp.json()
 
@@ -156,7 +175,8 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             if resp.status == 401:
                 raise UpdateFailed("Invalid ApeKey – check your API key")
             if resp.status == 479:
-                raise _RateLimitError
+                reset_ts = resp.headers.get("x-ratelimit-reset")
+                raise _RateLimitError(int(reset_ts) if reset_ts else None)
             resp.raise_for_status()
             data = await resp.json()
             _LOGGER.debug("Leaderboard rank response (%s): %s", resp.status, data)
