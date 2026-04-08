@@ -1,6 +1,7 @@
 """Monkeytype integration for Home Assistant."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -52,10 +53,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = MonkeytypeCoordinator(hass, entry.data)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    # First refresh in background – does not block HA startup
+    # First refresh in background after a short delay to avoid rate limiting
+    # the config_flow validation request that just ran.
+    async def _delayed_refresh():
+        await asyncio.sleep(30)
+        await coordinator.async_refresh()
+
     entry.async_create_background_task(
         hass,
-        coordinator.async_refresh(),
+        _delayed_refresh(),
         "monkeytype_initial_refresh",
     )
     return True
