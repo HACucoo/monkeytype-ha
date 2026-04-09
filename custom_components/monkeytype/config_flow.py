@@ -86,6 +86,8 @@ async def _validate_api_key(session: aiohttp.ClientSession, api_key: str) -> dic
                 return {"base": "invalid_auth"}
             if resp.status == 471:
                 return {"base": "ape_key_inactive"}
+            if resp.status == 479:
+                return {}  # Rate limited but key is valid – allow setup
             if resp.status != 200:
                 _LOGGER.warning("Monkeytype API returned unexpected status %s", resp.status)
                 return {"base": "cannot_connect"}
