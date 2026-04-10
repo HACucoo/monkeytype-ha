@@ -30,6 +30,7 @@ async def async_setup_entry(
     async_add_entities([
         MonkeytypeTodayBestWpmSensor(coordinator, label),
         MonkeytypeRankSensor(coordinator, label),
+        MonkeytypeDailyRankSensor(coordinator, label),
     ])
 
 
@@ -64,3 +65,19 @@ class MonkeytypeRankSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         return self.coordinator.data.get("rank") if self.coordinator.data else None
+
+
+class MonkeytypeDailyRankSensor(CoordinatorEntity, SensorEntity):
+    """Sensor for daily leaderboard rank."""
+
+    _attr_icon = "mdi:podium-gold"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator: MonkeytypeCoordinator, label: str) -> None:
+        super().__init__(coordinator)
+        self._attr_name = f"Monkeytype Daily Rank ({label})"
+        self._attr_unique_id = f"monkeytype_daily_rank_{label}"
+
+    @property
+    def native_value(self):
+        return self.coordinator.data.get("daily_rank") if self.coordinator.data else None

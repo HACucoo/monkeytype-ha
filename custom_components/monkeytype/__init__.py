@@ -103,11 +103,13 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             session = async_get_clientsession(self.hass)
             today_wpm = await self._fetch_today_best_wpm(session)
             rank = await self._fetch_rank(session)
+            daily_rank = await self._fetch_daily_rank(session)
             # Successful fetch – restore normal interval
             self.update_interval = self._default_interval
             return {
                 "today_best_wpm": today_wpm,
                 "rank": rank,
+                "daily_rank": daily_rank,
             }
         except _RateLimitError as err:
             self._apply_rate_limit_backoff(err.reset_ts)
@@ -180,6 +182,28 @@ class MonkeytypeCoordinator(DataUpdateCoordinator):
             resp.raise_for_status()
             data = await resp.json()
             _LOGGER.debug("Leaderboard rank response (%s): %s", resp.status, data)
+
+        entry = (data or {}).get("data")
+        return entry.get("rank") if entry else None
+
+    async def _fetch_daily_rank(self, session: aiohttp.ClientSession) -> int | None:
+        url = f"{BASE_URL}/daily/rank"
+        params = {
+            "language": self._language,
+            "mode": self._mode,
+            "mode2": self._mode2,
+        }
+
+        async with session.get(url, headers=self.headers, params=params) as resp:
+            if resp.status in (404, 204):
+                return None
+            if resp.status == 401:
+                raise UpdateFailed("Invalid ApeKey – check your API key")
+            if resp.status == 479:
+                reset_ts = resp.headers.get("x-ratelimit-reset")
+                raise _RateLimitError(int(reset_ts) if reset_ts else None)
+            resp.raise_for_status()
+            data = await resp.json()
 
         entry = (data or {}).get("data")
         return entry.get("rank") if entry else None
