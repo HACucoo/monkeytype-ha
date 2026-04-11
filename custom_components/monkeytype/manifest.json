@@ -1,7 +1,7 @@
 {
   "domain": "monkeytype",
   "name": "Monkeytype",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "documentation": "https://api.monkeytype.com",
   "config_flow": true,
   "requirements": [],

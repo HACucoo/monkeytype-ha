@@ -1,7 +1,7 @@
 # Monkeytype for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.6.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇩🇪 Deutsche Version](README.de.md)
 
@@ -134,6 +134,14 @@ The card takes up exactly one row and looks like this:
 ---
 
 ## Changelog
+
+### 0.7.0
+- Feat: Daily Leaderboard Rank sensor (`/daily/rank`)
+- Feat: Lovelace card visual editor with font_size/icon_size options
+- Feat: smart rate limit backoff using `x-ratelimit-reset` header
+- Fix: 479 during config flow no longer blocks setup
+- Fix: rate limit preserves last known sensor values instead of showing unknown
+- Fix: non-blocking startup with 30s delay to avoid rate limit burst
 
 ### 0.6.0
 - Fix: correct API endpoint (`/results`)
