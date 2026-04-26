@@ -1,7 +1,7 @@
 # Monkeytype for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.7.1-blue)
+![Version](https://img.shields.io/badge/version-0.7.2-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇩🇪 Deutsche Version](README.de.md)
 
@@ -134,6 +134,10 @@ The card takes up exactly one row and looks like this:
 ---
 
 ## Changelog
+
+### 0.7.2
+- Fix: properly chain `UpdateFailed` from rate-limit exception (B904)
+- Chore: ruff lint config added, modernised datetime.UTC and Callable imports
 
 ### 0.7.1
 - Refactor: deduplicated coordinator (single `_request` helper) and sensors (`SensorEntityDescription` pattern)

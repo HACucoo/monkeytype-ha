@@ -1,7 +1,7 @@
 # Monkeytype für Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.7.1-blue)
+![Version](https://img.shields.io/badge/version-0.7.2-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇬🇧 English version](README.md)
 
@@ -134,6 +134,10 @@ Die Karte belegt genau eine Zeile und sieht so aus:
 ---
 
 ## Changelog
+
+### 0.7.2
+- Fix: `UpdateFailed` chained Rate-Limit-Exception sauber (B904)
+- Chore: ruff Lint-Config hinzugefügt, modernere `datetime.UTC` und `Callable` Imports
 
 ### 0.7.1
 - Refactor: Coordinator und Sensoren entdoppelt (gemeinsamer `_request` Helper, `SensorEntityDescription`)
