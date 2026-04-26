@@ -10,6 +10,13 @@
           "mode2": "Mode detail (e.g. 60, 15, 100 …)",
           "language": "Language (e.g. english, german)"
         }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Monkeytype",
+        "description": "Your ApeKey is no longer accepted. Generate a new one at monkeytype.com → Account → Ape Keys and enter it below.",
+        "data": {
+          "api_key": "ApeKey"
+        }
       }
     },
     "error": {
@@ -18,7 +25,15 @@
       "cannot_connect": "Could not connect to the Monkeytype API"
     },
     "abort": {
-      "already_configured": "This mode is already configured"
+      "already_configured": "This mode is already configured",
+      "reauth_successful": "Re-authentication successful"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "today_best_wpm": { "name": "Today Best WPM" },
+      "rank": { "name": "Rank" },
+      "daily_rank": { "name": "Daily Rank" }
     }
   }
 }
