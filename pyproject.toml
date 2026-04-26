@@ -1,0 +1,29 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".venv", "__pycache__"]
+
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "F",    # pyflakes (unused imports, undefined names, …)
+  "I",    # isort (import order)
+  "B",    # flake8-bugbear (likely bugs)
+  "UP",   # pyupgrade (modern syntax)
+  "SIM",  # flake8-simplify
+  "ASYNC",# async-specific lints
+  "PIE",  # misc improvements
+  "RUF",  # ruff-specific
+]
+ignore = [
+  "E501",   # line too long (covered by formatter)
+  "B008",   # do not perform function call in argument defaults (vol.Required etc.)
+  "RUF001", # ambiguous unicode (en-dash) in strings – intentional
+  "RUF002", # ambiguous unicode in docstrings – intentional
+  "RUF003", # ambiguous unicode in comments – intentional
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.monkeytype"]
+combine-as-imports = true

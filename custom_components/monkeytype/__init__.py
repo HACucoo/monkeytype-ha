@@ -3,12 +3,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, TypedDict
 
 import aiohttp
-
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -121,7 +120,9 @@ class MonkeytypeCoordinator(DataUpdateCoordinator[MonkeytypeData]):
             self._apply_rate_limit_backoff(err.reset_ts)
             if self.data:
                 return self.data
-            raise UpdateFailed("Monkeytype rate limit hit on first fetch – will retry")
+            raise UpdateFailed(
+                "Monkeytype rate limit hit on first fetch – will retry"
+            ) from err
         except aiohttp.ClientError as err:
             raise UpdateFailed(f"Error communicating with Monkeytype API: {err}") from err
 
@@ -131,7 +132,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator[MonkeytypeData]):
 
     def _apply_rate_limit_backoff(self, reset_ts: int | None) -> None:
         if reset_ts:
-            wait = max(60, reset_ts - int(datetime.now(tz=timezone.utc).timestamp()))
+            wait = max(60, reset_ts - int(datetime.now(tz=UTC).timestamp()))
             self.update_interval = timedelta(seconds=wait + RATE_LIMIT_BUFFER_SECONDS)
             _LOGGER.warning(
                 "Monkeytype rate limit hit – next retry in %d min %d sec",
@@ -168,7 +169,7 @@ class MonkeytypeCoordinator(DataUpdateCoordinator[MonkeytypeData]):
 
     async def _fetch_today_best_wpm(self, session: aiohttp.ClientSession) -> float | None:
         # Use the API's onOrAfterTimestamp filter so we only fetch today's results
-        start_of_today = datetime.now(tz=timezone.utc).replace(
+        start_of_today = datetime.now(tz=UTC).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
         start_ts_ms = int(start_of_today.timestamp() * 1000)
