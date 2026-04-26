@@ -1,7 +1,7 @@
 # Monkeytype für Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.7.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.1-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇬🇧 English version](README.md)
 
@@ -134,6 +134,13 @@ Die Karte belegt genau eine Zeile und sieht so aus:
 ---
 
 ## Changelog
+
+### 0.7.1
+- Refactor: Coordinator und Sensoren entdoppelt (gemeinsamer `_request` Helper, `SensorEntityDescription`)
+- Feat: 401 löst HA-Reauth-UI automatisch aus
+- Feat: Reauth-Flow – ApeKey rotieren ohne Integration zu löschen
+- Verbesserung: `/results` mit `onOrAfterTimestamp` Filter – kleineres Payload
+- Verbesserung: 471 (ApeKey inaktiv) zur Laufzeit mit klarer Meldung
 
 ### 0.7.0
 - Feat: Daily Leaderboard Rang-Sensor (`/daily/rank`)

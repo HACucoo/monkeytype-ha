@@ -1,7 +1,7 @@
 # Monkeytype for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Version](https://img.shields.io/badge/version-0.7.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.1-blue)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-brightgreen)
 &nbsp;&nbsp;[🇩🇪 Deutsche Version](README.de.md)
 
@@ -134,6 +134,13 @@ The card takes up exactly one row and looks like this:
 ---
 
 ## Changelog
+
+### 0.7.1
+- Refactor: deduplicated coordinator (single `_request` helper) and sensors (`SensorEntityDescription` pattern)
+- Feat: 401 triggers HA reauth UI automatically (`ConfigEntryAuthFailed`)
+- Feat: reauth flow – rotate ApeKey without removing the integration
+- Improvement: `/results` uses `onOrAfterTimestamp` filter – smaller payload
+- Improvement: 471 (ApeKey inactive) reported with clear message at runtime
 
 ### 0.7.0
 - Feat: Daily Leaderboard Rank sensor (`/daily/rank`)
